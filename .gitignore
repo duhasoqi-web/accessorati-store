@@ -1,0 +1,16 @@
+**/node_modules/
+**/bin/
+**/obj/
+server/wwwroot/
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/appsettings.Production.json
+**/secrets.json
+**/.keys/
+**/.vs/
+*.user
+*.log
+artifacts/
+verification.json

@@ -1,0 +1,12 @@
+**/node_modules
+**/bin
+**/obj
+server/wwwroot
+.git
+.env*
+**/appsettings.Local.json
+**/appsettings.Production.json
+**/secrets.json
+**/.keys
+artifacts
+verification.json

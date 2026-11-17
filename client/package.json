@@ -1,0 +1,1 @@
+{"name":"accessorati-store","private":true,"type":"module","version":"1.0.0","scripts":{"build":"node build.mjs","dev":"node build.mjs --watch"},"dependencies":{"react":"19.3.1","react-dom":"19.3.1","scheduler":"0.28.0","lucide-react":"1.74.0"},"devDependencies":{"esbuild":"0.28.2"}}
