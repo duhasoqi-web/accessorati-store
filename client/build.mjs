@@ -13,6 +13,6 @@ const htmlPlugin={name:'versioned-html',setup(build){build.onEnd(async result=>{
  const css=entry[1].cssBundle?'<link rel="stylesheet" href="/assets/'+path.basename(entry[1].cssBundle)+'"/>':'';
  await fs.writeFile(path.join(target,'index.html'),template.replace('<script type="module" src="/src/main.jsx"></script>',css+'<script type="module" src="'+script+'"></script>'));
 })}};
-const options={absWorkingDir:import.meta.dirname,entryPoints:['src/main.jsx'],bundle:true,minify:true,sourcemap:false,outdir:path.join(target,'assets'),entryNames:'app-[hash]',jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},metafile:true,plugins:[htmlPlugin]};
+const options={absWorkingDir:import.meta.dirname,entryPoints:['src/main.jsx'],bundle:true,minify:true,sourcemap:false,outdir:path.join(target,'assets'),entryNames:'app-[hash]',jsx:'automatic',loader:{'.woff2':'file'},assetNames:'font-[hash]',publicPath:'/assets',define:{'process.env.NODE_ENV':'"production"'},metafile:true,plugins:[htmlPlugin]};
 if(process.argv.includes('--watch')){const context=await esbuild.context(options);await context.watch();console.log('Watching React source. Run ASP.NET at http://localhost:5080');}
 else{await esbuild.build(options);console.log('React production build complete with versioned assets.');}

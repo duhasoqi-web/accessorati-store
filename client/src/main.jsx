@@ -5,6 +5,7 @@ import{request,money}from'./api';
 import Admin from './Admin';
 import './style.css';
 import StoreEditorial from './StoreEditorial';
+import './luxe.css';
 
 function App(){
  const[data,setData]=useState(null),[error,setError]=useState(''),[search,setSearch]=useState(''),[category,setCategory]=useState('all'),[sort,setSort]=useState('new'),[drawer,setDrawer]=useState(false),[detail,setDetail]=useState(null),[checkout,setCheckout]=useState(false),[busy,setBusy]=useState(false),[success,setSuccess]=useState(null),[toast,setToast]=useState(''),[policy,setPolicy]=useState('');
