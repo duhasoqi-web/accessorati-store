@@ -1,5 +1,5 @@
 /* Luxury theme for shared UI: cart, modals, forms, admin. Loaded last. */
-:root{--cherry:#16080f;--velvet:#240e19;--wine:#3a1526;--gold:#d8bc8a;--gold-deep:#a98a58;--ivory:#f6efe4;--ivory-2:#ebe0cf;--ink:#26141b;--gold-line:#d8bc8a55}
+:root{--cherry:#80576c;--velvet:#896174;--wine:#734b60;--gold:#f9e5c7;--gold-deep:#a98a58;--ivory:#fff8f2;--ivory-2:#ebe0cf;--ink:#4a3040;--gold-line:#f9e5c755}
 body{font-family:'IBM Plex Sans Arabic',Tahoma,Arial,sans-serif;background:var(--cherry);color:var(--ink)}
 h2,h3{font-family:'Cormorant Garamond','Aref Ruqaa',serif}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold-deep);outline-offset:3px}
@@ -13,12 +13,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--wine)}
 .text-button,.policy-content a{color:var(--wine)}
 .setup-note{background:#f3e8d5;border:1px solid #dcc9a6;color:#6d5638;border-radius:2px}
 
-.overlay{background:#0d040adb;backdrop-filter:blur(6px)}
-.cart-drawer,.modal{background:var(--ivory);color:var(--ink);border-radius:0;box-shadow:0 0 90px #0009}
+.overlay{background:#65465bdb;backdrop-filter:blur(6px)}
+.cart-drawer,.modal{background:var(--ivory);color:var(--ink);border-radius:0;box-shadow:0 0 90px #55334799}
 .modal{border:1px solid var(--gold-deep);border-radius:2px}
 .drawer-title{background:var(--cherry);color:var(--gold);border-bottom:1px solid var(--gold-line);padding:22px 26px}
-.drawer-title h2{font:700 26px 'Aref Ruqaa',serif;color:var(--gold)}.drawer-title small{color:#bda88a}
-.drawer-title .icon{color:var(--gold);border:1px solid var(--gold-line);border-radius:50%}.drawer-title .icon:hover{background:var(--gold);color:var(--cherry)}
+.drawer-title h2{font:700 26px 'Aref Ruqaa',serif;color:var(--gold)}.drawer-title small{color:#ffeedc}
+.drawer-title .icon{color:var(--gold);border:1px solid var(--gold-line);border-radius:50%}.drawer-title .icon:hover{background:var(--gold);color:var(--ink)}
 .cart-item{border-bottom:1px solid #d9c9b0}.cart-item>img{background:linear-gradient(180deg,#f9f4ea,#e9dcc6);border:1px solid #d3bf9b;border-radius:80px 80px 2px 2px;mix-blend-mode:multiply}
 .cart-item strong,.detail-price,.success strong{color:var(--wine);font-family:'Cormorant Garamond',serif;font-size:19px}
 .quantity button{border:1px solid #c9b48f;border-radius:50%}.quantity .remove{color:#8b6b5d;border-radius:0}
@@ -32,17 +32,17 @@ input:focus,textarea:focus,select:focus{border-color:var(--wine)}
 .toast{background:var(--cherry);color:var(--gold);border:1px solid var(--gold-deep);border-radius:2px}
 
 /* admin */
-.logo{font:700 32px 'Aref Ruqaa',serif;color:var(--gold);letter-spacing:0}.logo span{font-family:'Cormorant Garamond',serif;letter-spacing:6px;color:#c99a94}
+.logo{font:700 32px 'Aref Ruqaa',serif;color:var(--gold);letter-spacing:0}.logo span{font-family:'Cormorant Garamond',serif;letter-spacing:6px;color:#f8d9d6}
 .login-page{background:var(--ivory)}
-.login-decoration{background:radial-gradient(ellipse at 50% 30%,#4a1a31,var(--cherry))}
-.login-decoration h1{color:var(--gold);font-family:'Aref Ruqaa',serif}.login-decoration p{color:#cdb9ae}
+.login-decoration{background:radial-gradient(ellipse at 50% 30%,#92687d,var(--cherry))}
+.login-decoration h1{color:var(--gold);font-family:'Aref Ruqaa',serif}.login-decoration p{color:#fff2eb}
 .login-lock{background:var(--wine);color:var(--gold);border-radius:50%}.login-card h2{color:var(--wine)}
-.back-store{color:var(--gold)}
+.back-store{color:var(--wine)}
 .admin-shell{background:var(--ivory)}
 .admin-sidebar{background:var(--cherry);border-left:1px solid var(--gold-line)}
-.admin-sidebar nav button{color:#cdb9ae;border-radius:2px}.admin-sidebar nav button:hover{color:var(--gold)}
-.admin-sidebar nav button.current{background:#d8bc8a1f;color:var(--gold);box-shadow:inset -3px 0 var(--gold)}
-.admin-sidebar>.secondary{border-color:var(--gold-line);color:var(--gold)}.logout{color:#a8938a}
+.admin-sidebar nav button{color:#fff2eb;border-radius:2px}.admin-sidebar nav button:hover{color:var(--gold)}
+.admin-sidebar nav button.current{background:#f9e5c71f;color:var(--gold);box-shadow:inset -3px 0 var(--gold)}
+.admin-sidebar>.secondary{border-color:var(--gold-line);color:var(--gold)}.logout{color:#ffede7}
 .admin-header h1{font:700 34px 'Aref Ruqaa',serif;color:var(--wine)}
 .admin-badge{border-radius:2px;border-color:#d3c1a5;background:#fbf7ef}
 .stats>div,.admin-panel{border:1px solid #d9c9b0;border-radius:2px;background:#fbf7ef}
