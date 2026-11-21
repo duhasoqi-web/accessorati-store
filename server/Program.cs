@@ -69,7 +69,7 @@ app.MapGet("/api/catalog",async(Store s)=>{
 });
 app.MapPost("/api/orders",async(Store s,Checkout input)=>{
     input.Validate();
-    var result=await s.Send("/rest/v1/rpc/place_order",HttpMethod.Post,new {p_key=input.RequestKey,p_name=input.Name.Trim(),p_phone=input.Phone.Trim(),p_address=input.Address.Trim(),p_notes=input.Notes?.Trim()??"",p_items=input.Items.Select(i=>new {product_id=i.ProductId,quantity=i.Quantity})});
+    var result=await s.Send("/rest/v1/rpc/place_order",HttpMethod.Post,new {p_key=input.RequestKey,p_name=input.Name.Trim(),p_phone=input.Phone.Trim(),p_address=$"{input.City.Trim()}، {input.Area.Trim()}",p_notes=input.Notes?.Trim()??"",p_items=input.Items.Select(i=>new {product_id=i.ProductId,quantity=i.Quantity})});
     return Results.Json(result);
 }).RequireRateLimiting("checkout");
 app.MapPost("/api/admin/login",async(HttpContext c,Store s,Login input,IConfiguration cfg)=>{
@@ -148,7 +148,7 @@ static class InputRules
 record StatusInput(string Status);
 record SettingsInput(int shipping_fee,bool accepting_orders,string contact_phone,string delivery_note, Dictionary<string,string>? footer);
 record Item(Guid ProductId,int Quantity);
-record Checkout(Guid RequestKey,string Name,string Phone,string Address,string? Notes,Item[] Items){public void Validate(){if(RequestKey==Guid.Empty||string.IsNullOrWhiteSpace(Name)||Name.Length>100||string.IsNullOrWhiteSpace(Phone)||Phone.Length>25||Phone.Count(char.IsAsciiDigit)<8||string.IsNullOrWhiteSpace(Address)||Address.Length>400||Notes?.Length>500||Items==null||Items.Length is <1 or >20||Items.Any(i=>i.ProductId==Guid.Empty||i.Quantity is <1 or >20)||Items.Select(i=>i.ProductId).Distinct().Count()!=Items.Length)throw new StoreException("تحقق من الاسم والهاتف والعنوان ومحتويات السلة.",400);}}
+record Checkout(Guid RequestKey,string Name,string Phone,string City,string Area,string? Notes,Item[] Items){public void Validate(){if(Phone is not {Length:10} || !Phone.StartsWith("05", StringComparison.Ordinal) || !Phone.All(char.IsAsciiDigit)) throw new StoreException("رقم الهاتف يجب أن يتكون من 10 أرقام ويبدأ بـ 05.",400);if(string.IsNullOrWhiteSpace(City)||City.Length>100||string.IsNullOrWhiteSpace(Area)||Area.Length>250)throw new StoreException("أدخلي المدينة والمنطقة.",400);if(RequestKey==Guid.Empty||string.IsNullOrWhiteSpace(Name)||Name.Length>100||Notes?.Length>500||Items==null||Items.Length is <1 or >20||Items.Any(i=>i.ProductId==Guid.Empty||i.Quantity is <1 or >20)||Items.Select(i=>i.ProductId).Distinct().Count()!=Items.Length)throw new StoreException("تحقق من الاسم والهاتف والعنوان ومحتويات السلة.",400);}}
 record ProductInput(string name,Guid category_id,string description,int price,int stock,string image_url,bool active,bool is_demo){public void Validate(){if(string.IsNullOrWhiteSpace(name)||name.Length>120||description.Length>2000||category_id==Guid.Empty||price is <1 or >10000000||stock is <0 or >100000||!Uri.TryCreate(image_url,UriKind.Absolute,out var u)||u.Scheme!="https"||image_url.Length>1500)throw new StoreException("تحقق من بيانات المنتج والسعر والكمية ورابط الصورة الآمن.",400);}}
 static class AuthApi{
  public static async Task SignIn(HttpContext c,string id)=>await c.SignInAsync("Admin",new ClaimsPrincipal(new ClaimsIdentity(new[]{new Claim(ClaimTypes.NameIdentifier,id)},"Admin")),new AuthenticationProperties{IsPersistent=false});
