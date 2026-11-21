@@ -34,6 +34,15 @@ builder.Services.AddRateLimiter(o=>{
     o.AddPolicy("checkout",c=>RateLimitPartition.GetFixedWindowLimiter(c.Connection.RemoteIpAddress?.ToString()??"unknown",_=>new(){PermitLimit=5,Window=TimeSpan.FromMinutes(10),QueueLimit=0}));
 });
 var app=builder.Build();
+if (string.Equals(builder.Configuration["RENDER"], "true", StringComparison.OrdinalIgnoreCase))
+{
+    // Render terminates public HTTPS before forwarding requests to Kestrel.
+    app.Use(async (context, next) =>
+    {
+        context.Request.Scheme = "https";
+        await next();
+    });
+}
 app.Use(async(c,next)=>{
     c.Response.Headers["X-Content-Type-Options"]="nosniff"; c.Response.Headers["Referrer-Policy"]="strict-origin-when-cross-origin";
     c.Response.Headers["X-Frame-Options"]="DENY";
