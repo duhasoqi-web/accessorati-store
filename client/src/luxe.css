@@ -48,3 +48,30 @@ input:focus,textarea:focus,select:focus{border-color:var(--wine)}
 .stats>div,.admin-panel{border:1px solid #d9c9b0;border-radius:2px;background:#fbf7ef}
 .stats>div{border-top:2px solid var(--gold-deep)}.stats strong{color:var(--wine);font-family:'Cormorant Garamond',serif;font-size:34px}
 .admin-panel h2{color:var(--wine)}
+
+.category-form { display:grid; gap:12px; max-width:460px; margin-bottom:20px; }
+.category-preview { width:44px; height:44px; object-fit:cover; }
+.custom-policy { white-space:pre-wrap; overflow-wrap:anywhere; }
+.print-heading { display:none; }
+@media(max-width:480px) {
+  .lx-header { flex-wrap:wrap; gap:8px; padding:10px 4%; }
+  .lx-header nav { display:flex; order:3; width:100%; flex-wrap:wrap; justify-content:center; gap:10px; }
+  .lx-credits, .developer-credit { overflow-wrap:anywhere; }
+  .admin-panel, .admin-content, .lx-tools, .lx-filters { min-width:0; }
+  .lx-tools { flex-wrap:wrap; }
+  .table-wrap { max-width:100%; overflow-x:auto; }
+  .modal { max-width:100%; }
+}
+@media print {
+  @page { margin:14mm; }
+  body { background:#fff !important; color:#000 !important; overflow:visible !important; }
+  .admin-shell > :not(.print-order), .print-order .drawer-title, .print-order .order-actions,
+  .print-order .print-button, .print-order button, .print-order .toast { display:none !important; }
+  .print-order.overlay, .print-order .modal, .print-order .order-details {
+    position:static !important; display:block !important; overflow:visible !important;
+    max-height:none !important; max-width:none !important; width:auto !important;
+    padding:0 !important; background:#fff !important; color:#000 !important; box-shadow:none !important; border:0 !important;
+  }
+  .print-heading { display:block; }
+  .print-order .order-lines > div { break-inside:avoid; }
+}

@@ -6,14 +6,16 @@ import './editorial.css';
 
 const INSTAGRAM='https://www.instagram.com/accesswarty.store/';
 const PHONE='+970594954420';
-const art=['lipstick','cream','perfume','jewel'];
-const descriptions=['لون يعبّر عنك','مساحة للعناية بذاتك','أثر جميل يبقى','أناقة في التفاصيل'];
 function Instagram({size=20}){return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".75" fill="currentColor" stroke="none"/></svg>}
 const Gem=()=><svg className="gem" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0l5 5-5 5-5-5z" fill="currentColor"/></svg>;
 
 export default function StoreEditorial({data,error,load,products,cats,settings,visible,category,selectCat,setCategory,search,setSearch,sort,setSort,favorites,fav,count,openCart,setPolicy,setDetail,add}){
+ const footer=data?.settings?.footer||{};
+ const instagram=footer.instagram||INSTAGRAM;
+ const creditPhone=footer.credit_phone||PHONE;
+ const instagramLabel='@'+new URL(instagram).pathname.split('/').filter(Boolean)[0];
  return <div className="editorial">
-  <div className="lx-topline"><span>الجمال في التفاصيل</span><a href={INSTAGRAM} target="_blank" rel="noopener noreferrer"><Instagram size={14}/><span dir="ltr">@accesswarty.store</span></a></div>
+  <div className="lx-topline"><span>الجمال في التفاصيل</span><a href={instagram} target="_blank" rel="noopener noreferrer"><Instagram size={14}/><span dir="ltr">{instagramLabel}</span></a></div>
   <header className="lx-header">
    <a href="/" className="lx-brand" aria-label="اكسسواراتي، الصفحة الرئيسية"><span className="lx-brand-ar">اكسسواراتي</span><span className="lx-brand-en" dir="ltr">Accessorati</span></a>
    <nav aria-label="القائمة الرئيسية"><a href="#shop" onClick={()=>setCategory('all')}>المجموعة</a><a href="#categories">عوالمنا</a><button onClick={()=>setPolicy('about')}>عن المتجر</button></nav>
@@ -31,7 +33,7 @@ export default function StoreEditorial({data,error,load,products,cats,settings,v
    <div className="lx-promise"><span><Truck size={18}/>توصيل إلى بابك</span><Gem/><span><ShieldCheck size={18}/>الدفع عند الاستلام</span><Gem/><span><Gift size={18}/>مختارة بعناية</span></div>
    <section id="categories" className="lx-worlds" aria-labelledby="worlds-title">
     <div className="lx-heading center"><h2 id="worlds-title">عوالم اكسسواراتي</h2><p>اختاري العالم الأقرب إليكِ.</p></div>
-    <div className="lx-arches">{cats.map((c,i)=><button key={c.id} onClick={()=>selectCat(c.id)} className="lx-world"><span className="world-arch"><img src={'/art/'+art[i%4]+'.svg'} alt="" loading="lazy"/></span><strong>{c.name}</strong><small>{descriptions[i%4]}</small></button>)}</div>
+    <div className="lx-arches">{cats.map(c=><button key={c.id} onClick={()=>selectCat(c.id)} className="lx-world"><span className="world-arch"><img src={c.image_url||'/art/jewel.svg'} onError={e=>{if(!e.currentTarget.src.endsWith('/art/jewel.svg'))e.currentTarget.src='/art/jewel.svg'}} alt="" loading="lazy"/></span><strong>{c.name}</strong></button>)}</div>
    </section>
    <section id="shop" className="lx-shop" aria-labelledby="collection-title">
     <div className="lx-heading center"><h2 id="collection-title">{category==='favorites'?'قطع أحببتِها':'المجموعة'}</h2><p>{visible.length} قطعة مختارة</p></div>
@@ -45,9 +47,9 @@ export default function StoreEditorial({data,error,load,products,cats,settings,v
     </article>)}</div>
     {data&&visible.length===0&&<div className="empty"><Search size={28}/><h3>قطعتك بانتظارك</h3><p>لم نجد منتجات بهذا الاختيار. جرّبي قسمًا أو كلمة أخرى.</p><button className="secondary" onClick={()=>{setSearch('');setCategory('all')}}>تصفّحي كل القطع</button></div>}
    </section>
-   <section className="lx-insta"><div className="insta-frame"><div className="insta-text"><h2>كوني أقرب للأشياء الحلوة</h2><p>إطلالات واختيارات جديدة وتفاصيل من عالم اكسسواراتي، على إنستغرام كل يوم.</p><a href={INSTAGRAM} target="_blank" rel="noopener noreferrer" className="lx-cta"><Instagram size={18}/><span dir="ltr">@accesswarty.store</span></a></div><div className="insta-arch"><div className="arch-outer small"><div className="arch-inner"><img src="/art/jewel.svg" alt="سلسال ذهبي بقلب وردي" loading="lazy"/></div></div></div></div></section>
+   <section className="lx-insta"><div className="insta-frame"><div className="insta-text"><h2>كوني أقرب للأشياء الحلوة</h2><p>إطلالات واختيارات جديدة وتفاصيل من عالم اكسسواراتي، على إنستغرام كل يوم.</p><a href={instagram} target="_blank" rel="noopener noreferrer" className="lx-cta"><Instagram size={18}/><span dir="ltr">{instagramLabel}</span></a></div><div className="insta-arch"><div className="arch-outer small"><div className="arch-inner"><img src="/art/jewel.svg" alt="سلسال ذهبي بقلب وردي" loading="lazy"/></div></div></div></div></section>
   </main>
-  <footer className="lx-footer"><div className="lx-footer-top"><div className="lx-footer-brand"><a href="/" className="lx-brand"><span className="lx-brand-ar">اكسسواراتي</span><span className="lx-brand-en" dir="ltr">Accessorati</span></a><p>للتفاصيل التي تجعلكِ أنتِ.</p><a className="footer-instagram" href={INSTAGRAM} target="_blank" rel="noopener noreferrer"><Instagram size={18}/><span dir="ltr">@accesswarty.store</span></a></div><div className="lx-footer-links"><h3>اكتشفي</h3><a href="#shop" onClick={()=>setCategory('all')}>المجموعة كاملة</a><a href="#categories">عوالمنا</a><button onClick={()=>setPolicy('about')}>عن المتجر</button></div><div className="lx-footer-links"><h3>نحن بالقرب</h3><button onClick={()=>setPolicy('contact')}>تواصلي معنا</button><button onClick={()=>setPolicy('delivery')}>التوصيل والدفع</button><button onClick={()=>setPolicy('returns')}>الاستبدال والإرجاع</button><button onClick={()=>setPolicy('privacy')}>سياسة الخصوصية</button></div></div>
-  <div className="lx-credits"><div className="developer-credit" dir="ltr"><span>© 2026 DS Technologies | Developed by Duha Soqi.</span><a href={'tel:'+PHONE} aria-label="اتصال بمطوّرة الموقع Duha Soqi"><Phone size={13}/><span>+970 594 954 420</span></a></div><a href="/admin">إدارة المتجر <ArrowUpLeft size={13}/></a></div></footer>
+  <footer className="lx-footer"><div className="lx-footer-top"><div className="lx-footer-brand"><a href="/" className="lx-brand"><span className="lx-brand-ar">اكسسواراتي</span><span className="lx-brand-en" dir="ltr">Accessorati</span></a><p>{footer.tagline||'للتفاصيل التي تجعلكِ أنتِ.'}</p><a className="footer-instagram" href={instagram} target="_blank" rel="noopener noreferrer"><Instagram size={18}/><span dir="ltr">{instagramLabel}</span></a></div><div className="lx-footer-links"><h3>{footer.discovery_heading||'اكتشفي'}</h3><a href="#shop" onClick={()=>setCategory('all')}>المجموعة كاملة</a><a href="#categories">عوالمنا</a><button onClick={()=>setPolicy('about')}>عن المتجر</button></div><div className="lx-footer-links"><h3>{footer.support_heading||'نحن بالقرب'}</h3><button onClick={()=>setPolicy('contact')}>تواصلي معنا</button><button onClick={()=>setPolicy('delivery')}>التوصيل والدفع</button><button onClick={()=>setPolicy('returns')}>الاستبدال والإرجاع</button><button onClick={()=>setPolicy('privacy')}>سياسة الخصوصية</button></div></div>
+  <div className="lx-credits"><div className="developer-credit" dir="ltr"><span>{footer.credit||'© 2026 DS Technologies | Developed by Duha Soqi.'}</span><a href={'tel:'+creditPhone} aria-label="اتصال بمطوّرة الموقع Duha Soqi"><Phone size={13}/><span>{footer.credit_phone||'+970 594 954 420'}</span></a></div><a href="/admin">إدارة المتجر <ArrowUpLeft size={13}/></a></div></footer>
  </div>;
 }

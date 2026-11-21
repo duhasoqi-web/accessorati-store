@@ -30,10 +30,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddRateLimiter(o=>{
     o.RejectionStatusCode=429;
     o.GlobalLimiter=PartitionedRateLimiter.Create<HttpContext,string>(c=>RateLimitPartition.GetFixedWindowLimiter(c.Connection.RemoteIpAddress?.ToString()??"unknown",_=>new(){PermitLimit=180,Window=TimeSpan.FromMinutes(1),QueueLimit=0}));
-    o.AddPolicy("login",c=>RateLimitPartition.GetFixedWindowLimiter(c.Connection.RemoteIpAddress?.ToString()??"unknown",_=>new(){PermitLimit=5,Window=TimeSpan.FromMinutes(10),QueueLimit=0}));
     o.AddPolicy("checkout",c=>RateLimitPartition.GetFixedWindowLimiter(c.Connection.RemoteIpAddress?.ToString()??"unknown",_=>new(){PermitLimit=5,Window=TimeSpan.FromMinutes(10),QueueLimit=0}));
 });
 var app=builder.Build();
+var loginGate = new AdminLoginGate();
 if (string.Equals(builder.Configuration["RENDER"], "true", StringComparison.OrdinalIgnoreCase))
 {
     // Render terminates public HTTPS before forwarding requests to Kestrel.
@@ -90,35 +90,63 @@ app.MapPost("/api/admin/login",async(HttpContext c,Store s,Login input,IConfigur
     }
     if(!app.Environment.IsDevelopment() && cfg["Admin:RequireMfa"]!="false") throw new StoreException("فعّل المصادقة الثنائية لحساب الإدارة قبل الدخول. راجع دليل الإعداد.",403);
     await AuthApi.SignIn(c,id!); return Results.Ok(new{mfa=false});
-}).RequireRateLimiting("login");
+}).AddEndpointFilter(loginGate.Filter);
 app.MapPost("/api/admin/verify",async(HttpContext c,IConfiguration cfg,MfaCode input)=>{
     if(c.User.FindFirstValue("mfa_pending")!="true") return Results.Unauthorized();
     if(input.Code?.Length!=6 || !input.Code.All(char.IsAsciiDigit)) throw new StoreException("أدخل رمزًا من 6 أرقام.",400);
     await AuthApi.Call(cfg,"/factors/"+c.User.FindFirstValue("factor")+"/verify",c.User.FindFirstValue("token")!,new{challenge_id=c.User.FindFirstValue("challenge"),code=input.Code});
     await AuthApi.SignIn(c,c.User.FindFirstValue(ClaimTypes.NameIdentifier)!); return Results.Ok(new{ok=true});
-}).RequireAuthorization().RequireRateLimiting("login");
+}).RequireAuthorization().AddEndpointFilter(loginGate.Filter);
 app.MapPost("/api/admin/logout",async(HttpContext c)=>{await c.SignOutAsync("Admin"); return Results.Ok();});
 var admin=app.MapGroup("/api/admin").RequireAuthorization();
 admin.AddEndpointFilter(async(ctx,next)=>ctx.HttpContext.User.HasClaim("mfa_pending","true")?Results.Unauthorized():await next(ctx));
-admin.MapGet("/me",(HttpContext c)=>new{authenticated=true});
-admin.MapGet("/data",async(Store s)=>Results.Json(new{products=await s.Send("/rest/v1/products?order=created_at.desc",HttpMethod.Get),categories=await s.Send("/rest/v1/categories?order=name",HttpMethod.Get),orders=await s.Send("/rest/v1/orders?select=*,order_items(*)&order=created_at.desc&limit=200",HttpMethod.Get),settings=(await s.Send("/rest/v1/store_settings?id=eq.1",HttpMethod.Get))?[0]}));
+admin.MapGet("/me",async(HttpContext c)=>new{authenticated=true,expiresAt=(await c.AuthenticateAsync("Admin")).Properties?.ExpiresUtc});
+admin.MapGet("/orders/history", async (Store s, int? page, string? status) =>
+{
+    var index = Math.Clamp(page ?? 0, 0, 100000);
+    var filter = string.IsNullOrWhiteSpace(status) ? "" : "&status=eq." + Uri.EscapeDataString(status);
+    return Results.Json(await s.Send($"/rest/v1/orders?select=*,order_items(*)&order=created_at.desc,id.desc&limit=50&offset={index * 50}{filter}", HttpMethod.Get));
+});
+admin.MapGet("/data",async(Store s)=>Results.Json(new{products=await s.Send("/rest/v1/products?order=created_at.desc",HttpMethod.Get),categories=await s.Send("/rest/v1/categories?order=name",HttpMethod.Get),orders=await s.Send("/rest/v1/orders?select=*,order_items(*)&order=created_at.desc,id.desc&limit=200",HttpMethod.Get),settings=(await s.Send("/rest/v1/store_settings?id=eq.1",HttpMethod.Get))?[0]}));
 admin.MapPost("/products",async(Store s,ProductInput p)=>{p.Validate();return Results.Json(await s.Send("/rest/v1/products",HttpMethod.Post,p));});
 admin.MapPut("/products/{id:guid}",async(Store s,Guid id,ProductInput p)=>{p.Validate();return Results.Json(await s.Send("/rest/v1/products?id=eq."+id,HttpMethod.Patch,p));});
 admin.MapDelete("/products/{id:guid}",async(Store s,Guid id)=>Results.Json(await s.Send("/rest/v1/products?id=eq."+id,HttpMethod.Patch,new{active=false})));
-admin.MapPost("/categories",async(Store s,CategoryInput i)=>{if(string.IsNullOrWhiteSpace(i.Name)||i.Name.Length>60)throw new StoreException("أدخل اسم القسم.",400);return Results.Json(await s.Send("/rest/v1/categories",HttpMethod.Post,new{name=i.Name.Trim()}));});
-admin.MapPut("/categories/{id:guid}",async(Store s,Guid id,CategoryInput i)=>{if(string.IsNullOrWhiteSpace(i.Name)||i.Name.Length>60)throw new StoreException("أدخل اسم القسم.",400);return Results.Json(await s.Send("/rest/v1/categories?id=eq."+id,HttpMethod.Patch,new{name=i.Name.Trim()}));});
+admin.MapPost("/categories",async(Store s,CategoryInput i)=>{if(string.IsNullOrWhiteSpace(i.Name)||i.Name.Length>60)throw new StoreException("أدخل اسم القسم.",400);return Results.Json(await s.Send("/rest/v1/categories",HttpMethod.Post,i.Payload()));});
+admin.MapPut("/categories/{id:guid}",async(Store s,Guid id,CategoryInput i)=>{if(string.IsNullOrWhiteSpace(i.Name)||i.Name.Length>60)throw new StoreException("أدخل اسم القسم.",400);return Results.Json(await s.Send("/rest/v1/categories?id=eq."+id,HttpMethod.Patch,i.Payload()));});
 admin.MapDelete("/categories/{id:guid}",async(Store s,Guid id)=>Results.Json(await s.Send("/rest/v1/categories?id=eq."+id,HttpMethod.Delete)));
 admin.MapPut("/orders/{id:guid}",async(Store s,Guid id,StatusInput i)=>{if(!new[]{"قيد التجهيز","تم الشحن","تم التسليم","ملغي"}.Contains(i.Status))throw new StoreException("حالة غير صالحة.",400);return Results.Json(await s.Send("/rest/v1/rpc/update_order_status",HttpMethod.Post,new{p_id=id,p_status=i.Status}));});
-admin.MapPut("/settings",async(Store s,SettingsInput i)=>{if(i.shipping_fee<0||i.shipping_fee>100000||i.contact_phone.Length>30||i.delivery_note.Length>300)throw new StoreException("تحقق من الإعدادات.",400);return Results.Json(await s.Send("/rest/v1/store_settings?id=eq.1",HttpMethod.Patch,i));});
+admin.MapPut("/settings",async(Store s,SettingsInput i)=>{if(i.shipping_fee<0||i.shipping_fee>100000||i.contact_phone.Length>30||i.delivery_note.Length>300||!ValidFooter(i.footer))throw new StoreException("تحقق من الإعدادات.",400);return Results.Json(await s.Send("/rest/v1/store_settings?id=eq.1",HttpMethod.Patch,i.footer is null ? (object)new {i.shipping_fee,i.accepting_orders,i.contact_phone,i.delivery_note} : i));});
 admin.MapPost("/upload",async(HttpContext c,Store s)=>{var form=await c.Request.ReadFormAsync();var file=form.Files.GetFile("file")??throw new StoreException("اختر صورة.",400);return Results.Ok(new{url=await s.Upload(file)});});
 app.MapFallbackToFile("index.html");
 app.Run();
 
+static bool ValidFooter(Dictionary<string,string>? footer)
+{
+    if (footer is null) return true;
+    string[] keys = ["tagline", "about", "returns", "privacy", "instagram", "discovery_heading", "support_heading", "credit", "credit_phone"];
+    return footer.All(entry => keys.Contains(entry.Key) && entry.Value is { Length: <= 2500 } &&
+        (entry.Key != "instagram" || entry.Value.Length == 0 || InputRules.IsHttps(entry.Value)));
+}
+
 record Login(string? Email,string? Password);
 record MfaCode(string? Code);
-record CategoryInput(string Name);
+record CategoryInput(string Name, string? ImageUrl)
+{
+    public object Payload()
+    {
+        var url = ImageUrl?.Trim();
+        if (!string.IsNullOrEmpty(url) && !InputRules.IsHttps(url))
+            throw new StoreException("أدخل رابط صورة HTTPS صالحًا.", 400);
+        return new { name = Name.Trim(), image_url = string.IsNullOrEmpty(url) ? null : url };
+    }
+}
+static class InputRules
+{
+    public static bool IsHttps(string value) => value.Length <= 1500 &&
+        Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme == "https";
+}
 record StatusInput(string Status);
-record SettingsInput(int shipping_fee,bool accepting_orders,string contact_phone,string delivery_note);
+record SettingsInput(int shipping_fee,bool accepting_orders,string contact_phone,string delivery_note, Dictionary<string,string>? footer);
 record Item(Guid ProductId,int Quantity);
 record Checkout(Guid RequestKey,string Name,string Phone,string Address,string? Notes,Item[] Items){public void Validate(){if(RequestKey==Guid.Empty||string.IsNullOrWhiteSpace(Name)||Name.Length>100||string.IsNullOrWhiteSpace(Phone)||Phone.Length>25||Phone.Count(char.IsAsciiDigit)<8||string.IsNullOrWhiteSpace(Address)||Address.Length>400||Notes?.Length>500||Items==null||Items.Length is <1 or >20||Items.Any(i=>i.ProductId==Guid.Empty||i.Quantity is <1 or >20)||Items.Select(i=>i.ProductId).Distinct().Count()!=Items.Length)throw new StoreException("تحقق من الاسم والهاتف والعنوان ومحتويات السلة.",400);}}
 record ProductInput(string name,Guid category_id,string description,int price,int stock,string image_url,bool active,bool is_demo){public void Validate(){if(string.IsNullOrWhiteSpace(name)||name.Length>120||description.Length>2000||category_id==Guid.Empty||price is <1 or >10000000||stock is <0 or >100000||!Uri.TryCreate(image_url,UriKind.Absolute,out var u)||u.Scheme!="https"||image_url.Length>1500)throw new StoreException("تحقق من بيانات المنتج والسعر والكمية ورابط الصورة الآمن.",400);}}

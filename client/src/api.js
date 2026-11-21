@@ -5,7 +5,7 @@ export async function request(path, options={}){
  const upload=options.body instanceof FormData;
  const r=await fetch('/api'+path,{...options,credentials:'same-origin',headers:{...(!upload&&options.body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-TOKEN':csrf}:{}),...options.headers},body:options.body&&!upload?JSON.stringify(options.body):options.body});
  const data=await r.json().catch(()=>null);
- if(!r.ok){if(r.status===401||r.status===400)csrf='';throw Error(data?.error||(r.status===429?'محاولات كثيرة، انتظر قليلًا وحاول مجددًا.':r.status===401?'يرجى تسجيل الدخول.':'تعذر تنفيذ العملية.'));}
+ if(!r.ok){if(r.status===401&&path.startsWith('/admin/')&&!['/admin/login','/admin/verify'].includes(path))window.dispatchEvent(new Event('admin-session-ended'));if(r.status===401||r.status===400)csrf='';throw Error(data?.error||(r.status===429?'محاولات كثيرة، انتظر قليلًا وحاول مجددًا.':r.status===401?'يرجى تسجيل الدخول.':'تعذر تنفيذ العملية.'));}
  if(path.includes('/login')||path.includes('/logout')||path.includes('/verify'))csrf='';
  return data;
 }
