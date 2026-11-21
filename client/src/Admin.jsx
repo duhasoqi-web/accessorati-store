@@ -1,7 +1,7 @@
 import React,{useEffect,useState}from'react';
 import{ShoppingBag,Package,Layers,Settings,LogOut,Plus,X,Upload,ShieldCheck,ArrowRight,LoaderCircle,Search,Eye,Pencil,Check}from'lucide-react';
 import{request,money}from'./api';
-const footerFields={tagline:'وصف المتجر في الفوتر',about:'عن المتجر',returns:'سياسة الاستبدال والإرجاع',privacy:'سياسة الخصوصية',instagram:'رابط إنستغرام HTTPS',discovery_heading:'عنوان روابط التصفح',support_heading:'عنوان روابط الدعم',credit:'نص الحقوق',credit_phone:'رقم التواصل بجانب الحقوق'};
+const footerFields={tagline:'وصف المتجر في الفوتر',about:'عن المتجر',returns:'سياسة الاستبدال والإرجاع',privacy:'سياسة الخصوصية',instagram:'رابط إنستغرام HTTPS',discovery_heading:'عنوان روابط التصفح',support_heading:'عنوان روابط الدعم',collection_label:"اسم رابط «المجموعة كاملة»",categories_label:"اسم رابط «عوالمنا»",about_label:"اسم رابط «عن المتجر»",contact_label:"اسم رابط «تواصلي معنا»",delivery_label:"اسم رابط «التوصيل والدفع»",returns_label:"اسم رابط «الاستبدال والإرجاع»",privacy_label:"اسم رابط «سياسة الخصوصية»",credit:'نص الحقوق',credit_phone:'رقم التواصل بجانب الحقوق'};
 const emptyProduct={name:'',category_id:'',description:'',price:'',stock:0,image_url:'',active:true,is_demo:false};
 const transitions={'جديد':['قيد التجهيز','ملغي'],'قيد التجهيز':['تم الشحن','ملغي'],'تم الشحن':['تم التسليم'],'تم التسليم':[],'ملغي':[]};
 export default function Admin(){
