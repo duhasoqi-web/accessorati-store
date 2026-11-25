@@ -29,3 +29,54 @@
 .jasmine-promo-grid img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain}
 .jasmine-promo-grid strong{display:block;padding:.8rem 1rem}
 @media(max-width:700px){.editorial .lx-hero{display:flex;flex-direction:column}.editorial .lx-hero-arch{width:100%}.editorial .lx-product{padding:6px}}
+
+/* Neutral photography surfaces keep each image's original colors and proportions. */
+:root {
+  --cherry:#92375c;
+  --velvet:#782849;
+  --wine:#672342;
+  --gold:#fff1ed;
+  --gold-deep:#92506b;
+  --ivory:#fffcfa;
+  --ivory-2:#f6e9ee;
+  --ink:#382431;
+  --gold-line:#dfbcca80;
+  --jasmine-border:#eadde2;
+  --jasmine-photo:#f7f6f4;
+}
+body,.editorial,.editorial .lx-header,.editorial .lx-shop {background:var(--ivory);color:var(--ink)}
+.editorial .lx-hero {background:#f9e1e9}
+.editorial .lx-promise {background:var(--ivory-2);color:var(--wine)}
+.editorial .lx-footer,.editorial .lx-topline {background:var(--wine)}
+.editorial .lx-footer .lx-brand-ar,.editorial .lx-footer .lx-brand-en {color:var(--gold)}
+.editorial .world-arch {background:var(--ivory-2);color:var(--wine);border-color:var(--jasmine-border)}
+.editorial .lx-products {gap:clamp(10px,2vw,24px)}
+.editorial .lx-product {padding:0;border-color:var(--jasmine-border);border-radius:16px;box-shadow:0 4px 15px #3824310b;min-width:0}
+.editorial .lx-product:hover {box-shadow:0 8px 24px #38243115}
+.editorial .lx-piece {aspect-ratio:1;padding:0;border:0;border-bottom:1px solid var(--jasmine-border);border-radius:0;background:var(--jasmine-photo)}
+.editorial .lx-piece::before {content:none}
+.editorial .lx-piece-img {padding:clamp(6px,1.4vw,18px);box-sizing:border-box}
+.editorial .lx-piece-img img {display:block;object-fit:contain;mix-blend-mode:normal;filter:none;transform:none}
+.editorial .lx-info {padding:12px;align-items:stretch;text-align:start}
+.editorial .lx-info h3 button {text-align:start;overflow-wrap:anywhere}
+.editorial .lx-add {margin-block-start:auto;background:var(--wine)}
+.jasmine-prices {margin-bottom:12px}
+.detail-content>img,.cart-item>img {
+  object-fit:contain;
+  mix-blend-mode:normal;
+  filter:none;
+  padding:8px;
+  background:var(--jasmine-photo);
+  border:1px solid var(--jasmine-border);
+  border-radius:12px;
+}
+input,textarea,select,.admin-panel,.stats>div,.admin-badge {background:#fff;border-color:var(--jasmine-border);border-radius:10px}
+.cart-summary {background:var(--ivory-2);border-color:var(--jasmine-border)}
+.cart-summary .total,.cart-item,.quantity button,.secondary {border-color:var(--jasmine-border)}
+.primary,.secondary,.modal,.drawer-title .icon {border-radius:10px}
+.drawer-title,.login-decoration,.admin-sidebar {background:var(--wine)}
+.overlay {background:#382431a6}
+@media (max-width:640px) {
+  .editorial .lx-info {padding:10px 8px}
+  .editorial .lx-add {width:100%}
+}
