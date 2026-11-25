@@ -123,8 +123,8 @@ app.Run();
 static bool ValidFooter(Dictionary<string,string>? footer)
 {
     if (footer is null) return true;
-    string[] keys = ["tagline", "about", "contact", "delivery", "returns", "privacy", "instagram", "discovery_heading", "support_heading", "collection_label", "categories_label", "about_label", "contact_label", "delivery_label", "returns_label", "privacy_label", "credit", "credit_phone", "promo_image_1", "promo_image_2", "promo_image_3", "promo_title_1", "promo_title_2", "promo_title_3"];
-    return footer.All(entry => keys.Contains(entry.Key) && entry.Value is { Length: <= 2500 } &&
+    string[] keys = ["tagline", "about", "contact", "delivery", "returns", "privacy", "instagram", "discovery_heading", "support_heading", "collection_label", "categories_label", "about_label", "contact_label", "delivery_label", "returns_label", "privacy_label", "credit", "credit_phone"];
+    return footer.All(entry => (keys.Contains(entry.Key) || System.Text.RegularExpressions.Regex.IsMatch(entry.Key, @"^promo_(image|title)_[1-9][0-9]*$")) && entry.Value is { Length: <= 2500 } &&
         ((entry.Key != "instagram" && !entry.Key.StartsWith("promo_image_", StringComparison.Ordinal)) || entry.Value.Length == 0 || InputRules.IsHttps(entry.Value)));
 }
 

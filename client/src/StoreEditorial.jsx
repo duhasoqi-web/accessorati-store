@@ -1,6 +1,8 @@
 import React from 'react';
 import {ArrowLeft,ArrowUpLeft,Heart,ShoppingBag,Search,Plus,Phone,Truck,ShieldCheck,Gift,LoaderCircle} from 'lucide-react';
 import {money} from './api';
+import {readPromotions} from './promotions';
+import {Watch,Wallet,Glasses,KeyRound} from 'lucide-react';
 import './fonts.css';
 import './editorial.css';
 
@@ -33,7 +35,7 @@ export default function StoreEditorial({data,error,load,products,cats,settings,v
    <div className="lx-promise"><span><Truck size={18}/>توصيل إلى بابك</span><Gem/><span><ShieldCheck size={18}/>الدفع عند الاستلام</span><Gem/><span><Gift size={18}/>مختارة بعناية</span></div>
    <section id="categories" className="lx-worlds" aria-labelledby="worlds-title">
     <div className="lx-heading center"><h2 id="worlds-title">عوالم ياسمين ستور</h2><p>اختاري العالم الأقرب إليكِ.</p></div>
-    <div className="lx-arches">{cats.map(c=><button key={c.id} onClick={()=>selectCat(c.id)} className="lx-world"><span className="world-arch"><img src={c.image_url||'/art/jasmine-hero.jpg'} onError={e=>{if(!e.currentTarget.src.endsWith('/art/jasmine-hero.jpg'))e.currentTarget.src='/art/jasmine-hero.jpg'}} alt="" loading="lazy"/></span><strong>{c.name}</strong></button>)}</div>
+    <div className="lx-arches">{cats.map(c=><button key={c.id} onClick={()=>selectCat(c.id)} className="lx-world"><span className="world-arch"><CategoryImage category={c}/></span><strong>{c.name}</strong></button>)}</div>
    </section>
    <section id="shop" className="lx-shop" aria-labelledby="collection-title">
     <div className="lx-heading center"><h2 id="collection-title">{category==='favorites'?'قطع أحببتِها':'المجموعة'}</h2><p>{visible.length} قطعة مختارة</p></div>
@@ -55,7 +57,7 @@ export default function StoreEditorial({data,error,load,products,cats,settings,v
 }
 
 function PromotionGallery({footer}) {
- const offers=[1,2,3].map(number=>({image:footer['promo_image_'+number],title:footer['promo_title_'+number]})).filter(offer=>offer.image);
+ const offers=readPromotions(footer);
  if(!offers.length)return null;
  return <section className="jasmine-promos" aria-labelledby="promo-title">
   <h2 id="promo-title">العروض الحالية</h2>
@@ -64,4 +66,13 @@ function PromotionGallery({footer}) {
    {offer.title&&<strong>{offer.title}</strong>}
   </a>)}</div>
  </section>;
+}
+
+function CategoryImage({category}) {
+ const [failed,setFailed]=React.useState(null);
+ const name=category.name.replace(/[أإآ]/g,'ا');
+ const Icon=/ساع/.test(name)?Watch:/محافظ/.test(name)?Wallet:/نظار/.test(name)?Glasses:/ميدال/.test(name)?KeyRound:ShoppingBag;
+ const fallback=/عط[ر و]/.test(name)?'/art/perfume.svg':/شنط|حق[يا]ئ?ب/.test(name)?'/art/jasmine-hero.jpg':null;
+ const image=category.image_url && failed!==category.image_url?category.image_url:fallback;
+ return image?<img src={image} alt="" loading="lazy" onError={()=>setFailed(image)}/>:<Icon size={55} aria-hidden="true"/>;
 }
