@@ -58,13 +58,43 @@ export default function StoreEditorial({data,error,load,products,cats,settings,v
 
 function PromotionGallery({footer}) {
  const offers=readPromotions(footer);
- if(!offers.length)return null;
- return <section className="jasmine-promos" aria-labelledby="promo-title">
+ const [active,setActive]=React.useState(0);
+ const [paused,setPaused]=React.useState(false);
+ const [engaged,setEngaged]=React.useState(false);
+ const start=React.useRef(null);
+ const count=offers.length;
+ const index=count ? active%count : 0;
+ function move(direction){setActive(current=>(current+direction+count)%count)}
+ React.useEffect(()=>{
+  if(count<2||paused||engaged||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const timer=setTimeout(()=>setActive(current=>(current+1)%count),5000);
+  return ()=>clearTimeout(timer);
+ },[count,index,paused,engaged]);
+ if(!count)return null;
+ return <section className="jasmine-promos" aria-labelledby="promo-title"
+  onMouseEnter={()=>setEngaged(true)} onMouseLeave={()=>setEngaged(false)}
+  onFocus={event=>{if(event.target.matches(':focus-visible'))setPaused(true)}}>
   <h2 id="promo-title">العروض الحالية</h2>
-  <div className="jasmine-promo-grid">{offers.map((offer,index)=><a href="#shop" key={index} aria-label={offer.title||'تصفّحي المجموعة'}>
-   <img src={offer.image} alt={offer.title||'إعلان من ياسمين ستور'} loading="lazy"/>
-   {offer.title&&<strong>{offer.title}</strong>}
-  </a>)}</div>
+  <div className="promo-window" dir="ltr"
+   onTouchStart={event=>{start.current=event.touches[0].clientX;setPaused(true)}}
+   onTouchEnd={event=>{
+    const distance=event.changedTouches[0].clientX-(start.current??event.changedTouches[0].clientX);
+    start.current=null;
+    if(count>1&&Math.abs(distance)>45)move(distance<0?1:-1);
+   }}>
+   <div className="promo-track" style={{transform:'translateX(-'+index*100+'%)'}}>
+    {offers.map((offer,i)=><div className="promo-slide" dir="rtl" key={i} aria-hidden={i!==index}>
+     <img src={offer.image} alt={offer.title||'إعلان من ياسمين ستور'} loading={i===0?'eager':'lazy'}/>
+     {offer.title&&<strong>{offer.title}</strong>}
+    </div>)}
+   </div>
+  </div>
+  {count>1&&<div className="promo-controls">
+   <button type="button" aria-label="الإعلان السابق" onClick={()=>move(-1)}>›</button>
+   <span aria-live={paused?'polite':'off'}>{index+1} / {count}</span>
+   <button type="button" aria-label="الإعلان التالي" onClick={()=>move(1)}>‹</button>
+   <button type="button" onClick={()=>setPaused(!paused)}>{paused?'تشغيل العرض':'إيقاف العرض'}</button>
+  </div>}
  </section>;
 }
 
