@@ -26,7 +26,7 @@ sealed class AdminLoginGate
                 var result = await next(context);
                 if (result is IStatusCodeHttpResult { StatusCode: 200 } &&
                     (http.Request.Path == "/api/admin/verify" ||
-                     http.Response.Headers.SetCookie.Any(cookie => cookie?.StartsWith("Accessorati.Admin=") == true)
+                     http.Response.Headers.SetCookie.Any(cookie => cookie?.StartsWith("JasmineStore.Admin=") == true)
                      && result is IValueHttpResult { Value: { } payload }
                      && payload.GetType().GetProperty("mfa")?.GetValue(payload) is false))
                     failures = 0;

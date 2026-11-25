@@ -64,7 +64,7 @@ begin
 end; $$;
 revoke execute on function public.place_order(uuid,text,text,text,text,jsonb),public.update_order_status(uuid,text) from public,anon,authenticated;
 grant execute on function public.place_order(uuid,text,text,text,text,jsonb),public.update_order_status(uuid,text) to service_role;
-insert into public.categories(id,name) values('00000000-0000-0000-0000-000000000001','مكياج'),('00000000-0000-0000-0000-000000000002','عناية بالبشرة'),('00000000-0000-0000-0000-000000000003','عطور'),('00000000-0000-0000-0000-000000000004','إكسسوارات');
+insert into public.categories(id,name) values('00000000-0000-0000-0000-000000000001','شنط كتف'),('00000000-0000-0000-0000-000000000002','شنط كروس'),('00000000-0000-0000-0000-000000000003','شنط مناسبات'),(gen_random_uuid(),'حقائب عملية'),(gen_random_uuid(),'محافظ'),(gen_random_uuid(),'ساعات'),(gen_random_uuid(),'أحزمة'),(gen_random_uuid(),'عطور'),(gen_random_uuid(),'ميداليات'),(gen_random_uuid(),'نظارات');
 insert into public.store_settings(id) values(1);
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('products','products',true,5000000,array['image/jpeg','image/png','image/webp']) on conflict(id) do nothing;
 commit;

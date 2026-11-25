@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: accessorati-store
+    name: jasmine-store
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile

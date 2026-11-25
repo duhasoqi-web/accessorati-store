@@ -15,7 +15,7 @@ builder.Services.AddProblemDetails();
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 6_000_000);
 builder.Services.AddAntiforgery(o => { o.HeaderName="X-CSRF-TOKEN"; o.Cookie.HttpOnly=true; o.Cookie.SameSite=SameSiteMode.Strict; o.Cookie.SecurePolicy=builder.Environment.IsDevelopment()?CookieSecurePolicy.SameAsRequest:CookieSecurePolicy.Always; });
 builder.Services.AddAuthentication("Admin").AddCookie("Admin", o => {
-    o.Cookie.Name="Accessorati.Admin"; o.Cookie.HttpOnly=true; o.Cookie.SameSite=SameSiteMode.Strict;
+    o.Cookie.Name="JasmineStore.Admin"; o.Cookie.HttpOnly=true; o.Cookie.SameSite=SameSiteMode.Strict;
     o.Cookie.SecurePolicy=builder.Environment.IsDevelopment()?CookieSecurePolicy.SameAsRequest:CookieSecurePolicy.Always;
     o.ExpireTimeSpan=TimeSpan.FromMinutes(30); o.SlidingExpiration=false;
     o.Events.OnRedirectToLogin=c=>{c.Response.StatusCode=401; return Task.CompletedTask;};
@@ -123,9 +123,9 @@ app.Run();
 static bool ValidFooter(Dictionary<string,string>? footer)
 {
     if (footer is null) return true;
-    string[] keys = ["tagline", "about", "contact", "delivery", "returns", "privacy", "instagram", "discovery_heading", "support_heading", "collection_label", "categories_label", "about_label", "contact_label", "delivery_label", "returns_label", "privacy_label", "credit", "credit_phone"];
+    string[] keys = ["tagline", "about", "contact", "delivery", "returns", "privacy", "instagram", "discovery_heading", "support_heading", "collection_label", "categories_label", "about_label", "contact_label", "delivery_label", "returns_label", "privacy_label", "credit", "credit_phone", "promo_image_1", "promo_image_2", "promo_image_3", "promo_title_1", "promo_title_2", "promo_title_3"];
     return footer.All(entry => keys.Contains(entry.Key) && entry.Value is { Length: <= 2500 } &&
-        (entry.Key != "instagram" || entry.Value.Length == 0 || InputRules.IsHttps(entry.Value)));
+        ((entry.Key != "instagram" && !entry.Key.StartsWith("promo_image_", StringComparison.Ordinal)) || entry.Value.Length == 0 || InputRules.IsHttps(entry.Value)));
 }
 
 record Login(string? Email,string? Password);
@@ -152,7 +152,7 @@ record Checkout(Guid RequestKey,string Name,string Phone,string City,string Area
     private static bool IsText(string? value) => !string.IsNullOrWhiteSpace(value) &&
         System.Text.RegularExpressions.Regex.IsMatch(value, @"\A[\p{L}\p{M} ]+\z") && value.Any(char.IsLetter);
 }
-record ProductInput(string name,Guid category_id,string description,int price,int stock,string image_url,bool active,bool is_demo){public void Validate(){if(string.IsNullOrWhiteSpace(name)||name.Length>120||description.Length>2000||category_id==Guid.Empty||price is <1 or >10000000||stock is <0 or >100000||!Uri.TryCreate(image_url,UriKind.Absolute,out var u)||u.Scheme!="https"||image_url.Length>1500)throw new StoreException("تحقق من بيانات المنتج والسعر والكمية ورابط الصورة الآمن.",400);}}
+record ProductInput(string name,Guid category_id,string description,int price,int stock,string image_url,bool active,bool is_demo,int? original_price){public void Validate(){if(original_price is int previousPrice && (previousPrice <= price || previousPrice > 10000000))throw new StoreException("السعر قبل الخصم لازم يكون أعلى من سعر البيع.",400);if(string.IsNullOrWhiteSpace(name)||name.Length>120||description.Length>2000||category_id==Guid.Empty||price is <1 or >10000000||stock is <0 or >100000||!Uri.TryCreate(image_url,UriKind.Absolute,out var u)||u.Scheme!="https"||image_url.Length>1500)throw new StoreException("تحقق من بيانات المنتج والسعر والكمية ورابط الصورة الآمن.",400);}}
 static class AuthApi{
  public static async Task SignIn(HttpContext c,string id)=>await c.SignInAsync("Admin",new ClaimsPrincipal(new ClaimsIdentity(new[]{new Claim(ClaimTypes.NameIdentifier,id)},"Admin")),new AuthenticationProperties{IsPersistent=false});
  public static async Task<JsonNode?> Call(IConfiguration cfg,string path,string token,object body){using var client=new HttpClient{Timeout=TimeSpan.FromSeconds(20)}; using var request=new HttpRequestMessage(HttpMethod.Post,cfg["Supabase:Url"]!.TrimEnd('/')+"/auth/v1"+path); request.Headers.Add("apikey",cfg["Supabase:ServiceKey"]);request.Headers.Authorization=new("Bearer",token);request.Content=JsonContent.Create(body);using var result=await client.SendAsync(request);if(!result.IsSuccessStatusCode)throw new StoreException("تعذر التحقق من رمز المصادقة.",401);return JsonNode.Parse(await result.Content.ReadAsStringAsync());}

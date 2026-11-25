@@ -1,0 +1,31 @@
+:root{--cherry:#a83861;--velvet:#84284d;--wine:#6b1d3f;--gold:#ffe6bc;--gold-deep:#ad6743;--ivory:#fff7f6;--ivory-2:#ffe7ed;--ink:#48162c}
+.editorial{background:#fff8f7;color:#48162c}
+.editorial .lx-header{background:#fff8f7;color:#48162c}
+.editorial .lx-brand-ar{color:#711e43}
+.editorial .lx-brand-en{color:#9a315a}
+.editorial .lx-hero{background:#ffdae6;color:#48162c;border-radius:30px;overflow:hidden;min-height:0}
+.editorial .lx-hero-copy{padding:clamp(2rem,6vw,6rem)}
+.editorial .lx-hero h1,.editorial .lx-hero p{color:#48162c}
+.editorial .lx-hero h1 span{color:#a12758}
+.editorial .lx-hero-arch{padding:0;height:100%;min-height:280px}
+.editorial .lx-hero-arch :is(.arch-outer,.arch-inner){width:100%;height:100%;max-width:none;aspect-ratio:auto;border-radius:0;padding:0;border:0}
+.editorial .lx-hero-arch img{display:block;width:100%;height:100%;min-height:280px;object-fit:cover;object-position:center}
+.editorial .lx-promise{background:#ffe9ef;color:#6b1d3f}
+.editorial .lx-shop{background:#fff8f7}
+.editorial .lx-heading h2,.editorial .lx-info h3 button,.editorial .lx-price{color:#711e43}
+.editorial .lx-product{padding:10px;background:#fff;border:1px solid #edc4d2;border-radius:22px;overflow:hidden;box-shadow:0 12px 26px #8b285d12;transition:box-shadow .2s,translate .2s}
+.editorial .lx-product:hover{translate:0 -3px;box-shadow:0 16px 30px #8b285d24}
+.editorial .lx-piece{background:#fff0f3;border:1px solid #f4d9e1;border-radius:15px;overflow:hidden;aspect-ratio:4/5}
+.editorial .lx-piece-img img{width:100%;height:100%;object-fit:contain}
+.editorial .lx-info{padding:14px 6px 4px}
+.editorial .lx-cat{color:#8d4262}
+.editorial .lx-add{background:#84284d;color:#fff;border-radius:12px}
+.jasmine-prices{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem .65rem;margin:.5rem 0;color:#783450}
+.jasmine-discount{background:#ffdae6;color:#702241;border-radius:20px;padding:.23rem .65rem;font-size:.875rem}
+.jasmine-promos{width:min(92%,1200px);margin:clamp(2rem,5vw,4rem) auto}
+.jasmine-promos h2{font-size:clamp(1.5rem,3vw,2.5rem);margin-bottom:1rem}
+.jasmine-promo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1rem}
+.jasmine-promo-grid a{display:block;border-radius:18px;overflow:hidden;background:#ffe5ed;color:#6b1d3f}
+.jasmine-promo-grid img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain}
+.jasmine-promo-grid strong{display:block;padding:.8rem 1rem}
+@media(max-width:700px){.editorial .lx-hero{display:flex;flex-direction:column}.editorial .lx-hero-arch{width:100%}.editorial .lx-product{padding:6px}}
